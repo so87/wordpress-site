@@ -1,16 +1,21 @@
-version: '3.2'
+version: '3'
 services:
   wordpress:
     build:
       context: wordpress/
     privileged: true
+    container_name: wordpress
+    volumes:
+      - ./data/wordpress/core:/var/www/html
+      - ./data/wordpress/content:/var/www/html/wp-content
     depends_on:
       - wordpress-db
     restart: always
     environment:
-      WORDPRESS_DB_HOST: wordpress-db:3306
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
+      - WORDPRESS_DB_HOST=wordpress-db:3306
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
       - VIRTUAL_HOST=blog.owens-netsec.com
       - LETSENCRYPT_HOST=blog.owens-netsec.com
       - LETSENCRYPT_EMAIL=simonowens157@gmail.com
@@ -19,16 +24,17 @@ services:
   wordpress-db:
     build: mysql/
     privileged: true
+    container_name: wordpress-db
     volumes:
-      - ./data:/var/lib/mysql
+      - ./data/mysql:/var/lib/mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: somewordpress
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
+      - MYSQL_ROOT_PASSWORD=somewordpress
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=wordpress
 
 networks:
   default:
-    external:
+     external:
       name: webproxy
